@@ -2,7 +2,7 @@ import sprites from "../sprites";
 
 const cache = new Map();
 
-type SpritesNames =
+export type SpritesNames =
   | "birdUp"
   | "birdDown"
   | "cactus"
@@ -52,4 +52,68 @@ function getSpriteAlphaMap(imageData: ImageData, name: SpritesNames) {
   return lines;
 }
 
-export default class Actor {}
+export default class Actor {
+  private _sprite: SpritesNames;
+  x: number;
+  y: number;
+  height: number;
+  width: number;
+  imageData?: ImageData;
+  alphaMap: any;
+
+  constructor(imageData?: ImageData) {
+    this._sprite = "birdDown";
+    this.height = 0;
+    this.width = 0;
+    this.x = 0;
+    this.y = 0;
+
+    if (imageData) {
+      this.imageData = imageData;
+      this.alphaMap = [];
+    }
+  }
+
+  set sprite(name: SpritesNames) {
+    this._sprite = name;
+    this.height = sprites[name].h / 2;
+    this.width = sprites[name].w / 2;
+
+    if (this.imageData) {
+      this.alphaMap = getSpriteAlphaMap(this.imageData, name);
+    }
+  }
+
+  get sprite() {
+    return this._sprite;
+  }
+
+  get rightX() {
+    return this.width + this.x;
+  }
+
+  get bottomY() {
+    return this.height + this.y;
+  }
+
+  hits(actors: Actor[]) {
+    return actors.some((actor) => {
+      if (!actor) {
+        return false;
+      }
+
+      if (this.x >= actor.rightX || actor.x >= this.rightX) {
+        return false;
+      }
+
+      if (this.y >= actor.bottomY || actor.y >= this.bottomY) {
+        return false;
+      }
+
+      return true;
+    });
+  }
+}
+
+const tester = new Actor();
+tester.sprite = "birdDown";
