@@ -1,4 +1,4 @@
-import Actor from "./Actor";
+import Actor from "./Actor.js";
 
 export default class Dino extends Actor {
   vVelocity: number | null;
@@ -19,6 +19,14 @@ export default class Dino extends Actor {
 
   get dy() {
     return this.baseY - this.height + this.relativeY;
+  }
+
+  set dy(value) {
+    this.baseY = value;
+  }
+
+  get bottomY() {
+    return this.height + this.dy;
   }
 
   reset() {
@@ -47,5 +55,29 @@ export default class Dino extends Actor {
       this.vVelocity = null;
       this.relativeY = 0;
     }
+  }
+
+  hits(actors: Actor[]) {
+    return actors.some((actor) => {
+      if (!actor) {
+        return false;
+      }
+
+      if (this.x >= actor.rightX || actor.x >= this.rightX) {
+        return false;
+      }
+
+      if (this.dy >= actor.bottomY || actor.y >= this.bottomY) {
+        console.log("y position not satisified");
+        console.log("dy: " + this.dy);
+        console.log("bottomY: " + this.bottomY);
+        console.log("actor bottom: " + actor.bottomY);
+        console.log("actor y: " + actor.y);
+
+        return false;
+      }
+
+      return true;
+    });
   }
 }

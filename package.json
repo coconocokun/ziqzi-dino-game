@@ -1,5 +1,6 @@
 {
   "private": true,
+  "module": "commonjs",
   "scripts": {
     "dev": "reload"
   },

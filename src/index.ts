@@ -1,6 +1,6 @@
-import DinoGame from "./game/DinoGame";
+import DinoGame from "./game/DinoGame.js";
 
-const game = new DinoGame(600, 100);
+const game = new DinoGame(600, 150);
 
 const keycodes = {
   // up, spacebar
@@ -10,4 +10,15 @@ const keycodes = {
 };
 
 // Input gate
-document.addEventListener("keydown", (e) => {});
+document.addEventListener("keydown", (e) => {
+  game.onInput();
+});
+
+game
+  .start()
+  .then(() => {
+    console.log("game started");
+  })
+  .catch((err) => {
+    console.log(err);
+  });

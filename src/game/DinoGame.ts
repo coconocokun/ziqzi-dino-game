@@ -1,10 +1,10 @@
-import Dino from "../actors/Dino";
-import { getImageData, loadFont, loadImage } from "../utils";
-import GameRunner from "./GameRunner";
-import sprites from "../sprites";
-import Actor, { SpritesNames } from "../actors/Actor";
-import Cactus from "../actors/Cactus";
-import { playSound } from "../sounds";
+import Dino from "../actors/Dino.js";
+import { getImageData, loadFont, loadImage } from "../utils.js";
+import GameRunner from "./GameRunner.js";
+import sprites from "../sprites.js";
+import Actor, { SpritesNames } from "../actors/Actor.js";
+import Cactus from "../actors/Cactus.js";
+import { playSound } from "../sounds.js";
 
 export default class DinoGame extends GameRunner {
   canvas: HTMLCanvasElement;
@@ -32,7 +32,7 @@ export default class DinoGame extends GameRunner {
       cactiSpawnRate: 50,
       dinoGravity: 0.5,
       dinoGroundOffset: 4,
-      dinoRift: 10,
+      dinoLift: 10,
       dinoX: 25,
     };
 
@@ -119,7 +119,7 @@ export default class DinoGame extends GameRunner {
     // Draw Dino
     this.drawDino();
     // Draw Score
-    this.drawScore();
+    // this.drawScore();
 
     if (this.state.isRunning) {
       // Draw Cactus
@@ -132,6 +132,7 @@ export default class DinoGame extends GameRunner {
 
       if (this.state.gameOver) {
         // end game
+        this.endGame();
       }
     }
     // if gameover -> end game
@@ -139,6 +140,7 @@ export default class DinoGame extends GameRunner {
 
   endGame() {
     // stop the game
+    this.state.isRunning = false;
     this.stop();
     // game over text
   }
