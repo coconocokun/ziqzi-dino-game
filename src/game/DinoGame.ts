@@ -1,10 +1,11 @@
 import Dino from "../actors/Dino.js";
-import { getImageData, loadFont, loadImage } from "../utils.js";
+import { getImageData, loadFont, loadImage, randInteger } from "../utils.js";
 import GameRunner from "./GameRunner.js";
 import sprites from "../sprites.js";
 import Actor, { SpritesNames } from "../actors/Actor.js";
 import Cactus from "../actors/Cactus.js";
 import { playSound } from "../sounds.js";
+import Cloud from "../actors/Cloud.js";
 
 export default class DinoGame extends GameRunner {
   canvas: HTMLCanvasElement;
@@ -30,6 +31,7 @@ export default class DinoGame extends GameRunner {
     this.defaultSettings = {
       bgSpeed: 8,
       cactiSpawnRate: 50,
+      cloudSpawnRate: 60,
       dinoGravity: 0.5,
       dinoGroundOffset: 4,
       dinoLift: 10,
@@ -40,10 +42,16 @@ export default class DinoGame extends GameRunner {
       settings: { ...this.defaultSettings },
       dino: null,
       cacti: [],
+      cloud: [],
       gameOver: false,
       isRunning: false,
       groundX: 0,
       groundY: 0,
+      score: {
+        value: 0,
+        frame: 0,
+        frameRate: 6,
+      },
     };
   }
 
@@ -106,6 +114,11 @@ export default class DinoGame extends GameRunner {
       cacti: [],
       gameOver: false,
       isRunning: true,
+      score: {
+        value: 0,
+        frame: 0,
+        frameRate: 6,
+      },
     });
     // Initialize score
     // restart the game
@@ -118,6 +131,7 @@ export default class DinoGame extends GameRunner {
     this.drawGround();
     // Draw Dino
     this.drawDino();
+    this.drawCloud();
     // Draw Score
     this.drawScore();
 
@@ -130,6 +144,8 @@ export default class DinoGame extends GameRunner {
         playSound("game-over");
         this.state.gameOver = true;
       }
+
+      this.updateLevel();
 
       if (this.state.gameOver) {
         // end game
@@ -144,6 +160,13 @@ export default class DinoGame extends GameRunner {
     this.stop();
     this.state.isRunning = false;
     // game over text
+    this.paintText("GAME OVER", this.width / 2, this.height / 2 - 10, {
+      font: "PressStart2P",
+      size: "12px",
+      align: "center",
+      baseline: "bottom",
+      color: "#535353",
+    });
   }
 
   drawBackground() {
@@ -192,6 +215,27 @@ export default class DinoGame extends GameRunner {
     }
   }
 
+  drawCloud() {
+    const state = this.state;
+    const cloud = state.cloud;
+    const settings = state.settings;
+
+    this.progressInstances(cloud);
+    if (this.frameCount % settings.cloudSpawnRate == 0) {
+      // spawn new cacti
+      const newCloud = new Cloud(this.spriteImageData);
+      newCloud.speed = settings.bgSpeed;
+      newCloud.x = this.width;
+      newCloud.y = this.height - newCloud.height - randInteger(40, 60);
+      cloud.push(newCloud);
+    }
+
+    for (let i = 0; i < cloud.length; i++) {
+      const element = cloud[i];
+      this.paintSprite(element.sprite, element.x, element.y);
+    }
+  }
+
   drawDino() {
     const dino = this.state.dino;
 
@@ -199,7 +243,48 @@ export default class DinoGame extends GameRunner {
     this.paintSprite(dino.sprite, dino.x, dino.dy);
   }
 
-  drawScore() {}
+  drawScore() {
+    const { state } = this;
+    const fontSize = 12;
+
+    if (state.isRunning) {
+      state.score.frame++;
+
+      if (state.score.frame >= state.score.frameRate) {
+        state.score.frame = 0;
+        state.score.value++;
+      }
+    }
+
+    // paint text
+    this.paintText((state.score.value + "").padStart(5, "0"), this.width, 0, {
+      font: "PressStart2P",
+      size: `${fontSize}px`,
+      align: "right",
+      baseline: "top",
+      color: "#535353",
+    });
+  }
+
+  paintText(text: string, x: number, y: number, opts: any) {
+    const { canvasCtx } = this;
+    // set font size, font type
+    const { font, size } = opts;
+    // set font color
+    canvasCtx.font = `${size} ${font}`;
+    if (opts.color) {
+      canvasCtx.fillStyle = opts.color;
+    }
+    // set alignment
+    if (opts.align) {
+      canvasCtx.textAlign = opts.align;
+    }
+    if (opts.baseline) {
+      canvasCtx.textBaseline = opts.baseline;
+    }
+    // draw on the x, y
+    canvasCtx.fillText(text, x, y);
+  }
 
   paintSprite(spriteName: SpritesNames, dx: number, dy: number) {
     const { h, w, x, y } = sprites[spriteName];
@@ -215,5 +300,10 @@ export default class DinoGame extends GameRunner {
         instances.splice(i, 1);
       }
     }
+  }
+
+  updateLevel() {
+    // Check if the score is high enough
+    // if (state.score.value % 100 == 0), then increase bgSpeed
   }
 }

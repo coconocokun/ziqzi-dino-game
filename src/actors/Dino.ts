@@ -6,6 +6,8 @@ export default class Dino extends Actor {
   baseY: number;
   relativeY: number;
   lift: number;
+  legFrameRate: number;
+  legFrame: number;
 
   constructor(imageData?: ImageData) {
     super(imageData);
@@ -14,7 +16,9 @@ export default class Dino extends Actor {
     this.baseY = 0; // always plus. constant
     this.relativeY = 0; // always minus
     this.lift = 0;
-    this.sprite = "dino";
+    this.sprite = "dinoLeftLeg";
+    this.legFrameRate = 6;
+    this.legFrame = 0;
   }
 
   get dy() {
@@ -47,10 +51,27 @@ export default class Dino extends Actor {
       this.vVelocity = null;
       this.relativeY = 0;
     }
+    // toggle leg
+    this.determineLeg();
   }
 
   get bottomY() {
     return this.height + this.dy;
+  }
+
+  determineLeg() {
+    this.legFrame++;
+
+    if (this.relativeY < 0) {
+      this.sprite = "dino";
+    } else if (this.legFrame >= this.legFrameRate) {
+      if (this.sprite == "dinoLeftLeg") {
+        this.sprite = "dinoRightLeg";
+      } else {
+        this.sprite = "dinoLeftLeg";
+      }
+      this.legFrame = 0;
+    }
   }
 
   hits(actors: Actor[]) {
