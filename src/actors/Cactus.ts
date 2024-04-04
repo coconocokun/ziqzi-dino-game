@@ -1,4 +1,4 @@
-import Actor from "./Actor";
+import Actor from "./Actor.js";
 
 export default class Cactus extends Actor {
   speed: number;

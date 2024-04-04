@@ -1,4 +1,4 @@
-import sprites from "../sprites";
+import sprites from "../sprites.js";
 
 const cache = new Map();
 
@@ -94,24 +94,6 @@ export default class Actor {
 
   get bottomY() {
     return this.height + this.y;
-  }
-
-  hits(actors: Actor[]) {
-    return actors.some((actor) => {
-      if (!actor) {
-        return false;
-      }
-
-      if (this.x >= actor.rightX || actor.x >= this.rightX) {
-        return false;
-      }
-
-      if (this.y >= actor.bottomY || actor.y >= this.bottomY) {
-        return false;
-      }
-
-      return true;
-    });
   }
 }
 
